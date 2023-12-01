@@ -10,7 +10,7 @@ The documentation is in german.
 ## Files
 `Newton Grafisch.ggb`: graphical drawing of the problem with the parameters used in the program. Open in [GeoGebra](https://geogebra.org/calculator)
 
-`Newton.mms`: The implementation of the algorithm using MMIX assembler
+`Newton.mms`: The implementation of the algorithm using MMIX assembler (pleas note that the program flow of this implementation isn't ideal, also the naming conventions of register labels are all over the place, please have a look at the version utilizing the stack for a better example)
 
 `Newton_PUSH_POP.mms`: The implementation of the algorithm in MMIX assembler, additionally taking advantage of the integrated stack management of the MMIX.
 
