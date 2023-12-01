@@ -12,8 +12,14 @@ The documentation is in german.
 
 `Newton.mms`: The implementation of the algorithm using MMIX assembler
 
+`Newton_PUSH_POP.mms`: The implementation of the algorithm in MMIX assembler, additionally taking advantage of the integrated stack management of the MMIX.
+
 ## Running the code
 To run the code you need an MMIX emulator. The [MMIX Visual Debugger](https://www.mmix.cs.hm.edu/mmixvd/help/mmixvd.html) ([download](https://www.mmix.cs.hm.edu/mmixvd/index.html)) is recommended for doing so.
 
 ## Further Information
-Some more information about the MMIX and it's architecture can be found at the official [MMIX Website](https://www.mmix.cs.hm.edu/)
+In case you are fluent in german the [_MMIX Buch_](https://link.springer.com/book/10.1007/978-3-642-56233-4) (by Anlauf, Bötcher, Ruckert; ISBN : 978-3-540-42408-6) is, thanks to it's easy and clear descriptions, an excellent starting point. It includes detailed information about the instruction set, gives examples on how to use it and explains the ideas behind their functionality, often by using illustrative diagrams.
+
+Some more information about the MMIX and it's architecture can be found at the official [MMIX Website](https://www.mmix.cs.hm.edu/).
+
+For a deeper dive into the architecture it's [definition](https://www.mmix.cs.hm.edu/doc/fasc1.pdf) might be helpful. 
