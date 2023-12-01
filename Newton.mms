@@ -6,7 +6,7 @@
 %
 % In dieser Datei wird ein 2D Newton Verfahren implementiert mit welchem Nullstellen
 % polynomialer Funktionen vierten Grades berechnet werden können (weitere Informationen
-% siehe https://de.wikipedia.org/wiki/Newtonverfahren). Für die Berechnung der Benötigte
+% siehe https://de.wikipedia.org/wiki/Newtonverfahren). Die Berechnung der benötigten
 % Ableitung wird mit einem einfachen Zweipunkt Verfahren implementiert.
 %
 % Dieses Programm entstand im Rahmen der Kleingruppen-Übungen im Fach 'Grundlagen der
@@ -27,19 +27,20 @@
 % enthalten.
 data		GREG @
 
-% setzen einiger Variablen im Hauptspeicher an die Stelle die zuvor ins Globale
-% Register eingetragen wurde. Die Variablen werden dabei als Tetra in den Hauptspeicher
-% eingetragen in der Reihenfolge wie sie unten stehen
+% Setzen einiger Variablen im Hauptspeicher an jene zuvor ins globale Register ein-
+% getragenen Stelle. Die Variablen werden dabei als Tetra im Hauptspeicher, in der 
+% gegebenen Reihenfolge hinterlegt.
 			TETRA	-1,3,2,-4,1	% Parameter der Funktion (als Ganzzahl)
 			TETRA	20			% Maximale Zahl der Iterationen (da Newton Verfahren sehr
 								% schnell konvergieren (wenn sie konvergieren) muss diese
-								% Zahl nicht sonderlich groß sein)
-			OCTA 	1.00		% Initialwert (Start der Suche, Gleitkommazahl)
+								% Zahl nicht sonderlich groß sein, Ganzzahl)
+			OCTA 	-1.00		% Initialwert (Start der Suche, Gleitkommazahl)
 			OCTA	0.015625	% Schrittweite (Gleitkommazahl)
 % Achtung: Die Gleitkommawerte die statisch zugewiesen werden müssen exakt dargestellt
 % werden können (sprich eine Summe aus zweier Potenzen sein z. B. 2^-1+2^-3=0.625)
 % Hinweise: Die Nullstellen mit der gegebenen Parametrisierung liegen bei ca. -1.3088749,
 % 0.326637, 0.7161587, 3.2660789. Damit kann die Lösung geprüft werden.
+% Startwerte zum Testen: -2, -1, 0.25, 0.375, 0.625, 1, 3, 4
 % Extremstellen sind -0.7651302, 0.524821, 2.4903088 werden diese als Startwerte genommen
 % ist schlechte Konvergenz zu erwarten (sprich es wird keine Nullstelle gefunden oder die
 % Suche dauert sehr lange)
@@ -62,47 +63,47 @@ jmp_to		IS $4	% Adresse zu der Gesprungen werden soll
 
 % Label für Register mit den Parametern unserer Kubischen Funktion. Die Funktion hat
 % das folgende Aussehen: y = a*x³ + b*x² + c*x + d
-var_a		IS $8
-var_b		IS $9
-var_c		IS $10
-var_d		IS $11
-var_e		IS $12
+var_a		IS $5
+var_b		IS $6
+var_c		IS $7
+var_d		IS $8
+var_e		IS $9
 
 % Label für das Register mit aktuellem x und der Schrittweite
-var_x		IS $16
-var_x_l		IS $17	% x aus vorherigem Schritt
-var_dx		IS $18
+var_x		IS $10
+var_x_l		IS $11	% x aus vorherigem Schritt
+var_dx		IS $12
 
 % Label für Register mit dem aktuellen Funktions-/Ableitungswert
-var_f		IS $20
-var_df		IS $21
+var_f		IS $13
+var_df		IS $14
 
 % Weitere Labeln von Registern für den temporären Gebrauch
-var_n_max	IS $22	% Maximale Zahl der Iterationen
-var_n		IS $23	% Aktuelle Iteration
-var_fx		IS $24	% Übergabewert des gewünschten x der Routine CalcF
-var_fint	IS $25	% Für Interne Berechnung von CalcF
-var_f_s		IS $26	% gesicherter Wert von f
-var_qfdf	IS $27	% Quotient in CaclNextX
-var_isclose	IS $28	% Wird zu 1 wenn wir das Ergebnis erreicht haben
-var_isnmax	IS $29	% Wir haben die maximale Zahl an Iterationen erreicht
-var_target	IS $30	% Wird zu 0 gesetzt
+var_n_max	IS $15	% Maximale Zahl der Iterationen
+var_n		IS $16	% Aktuelle Iteration
+var_fx		IS $17	% Übergabewert des gewünschten x der Routine CalcF
+var_fint	IS $18	% Für Interne Berechnung von CalcF
+var_f_s		IS $19	% gesicherter Wert von f
+var_qfdf	IS $20	% Quotient in CaclNextX
+var_isclose	IS $21	% Wird zu 1 wenn wir das Ergebnis erreicht haben
+var_isnmax	IS $22	% Wir haben die maximale Zahl an Iterationen erreicht
+var_target	IS $23	% Wird zu 0 gesetzt
 
 
 
 % Setzen der Aktuellen Position (jetzt im Text Segment)
-% Es wird hierbei einfach die Adresse 0x100 als Beginn des Programs gewählt.
-% Hinweis: in der tatsächlichen Implementierung der MMIX sind Befehls und Hauptspeicher
+% Es wird hierbei einfach die Adresse 0x100 als Beginn des Programms gewählt.
+% Hinweis: in der tatsächlichen Implementierung der MMIX sind Befehls- und Hauptspeicher
 % in eine Einheit integriert. Die Trennung in der Vorlesung ergibt trotzdem Sinn, da die
 % Bereiche für Programm (Text Segment) und variable Daten (Data Segment) durch das
 % zuweisen verschiedener Adressbereiche getrennt werden (Siehe MMIX-Buch S.42,
-% https://www.mmix.cs.hm.edu/doc/instructions.html#LOC) und man es sich auch wie physisch
-% verschiedene Speicher vorstellen kann. Dementsprechend beginnt unser Programmablauf
+% https://www.mmix.cs.hm.edu/doc/instructions.html#LOC). Man es sich durchaus auch wie
+% physisch getrennte Speicher vorstellen. Dementsprechend beginnt unser Programmablauf
 % an der Position 0x100, was im Bild der Vorlesung dem "Beginn" unseres Befehls-
-% speicher gleichkommt.
+% speichers gleichkommt.
 			LOC #100
 
-% Definieren des Main Programs
+% Definieren des Haupt-Programms
 Main		GETA	jmp_to,LdData			% Abrufen der Adresse des Unterprogramms
 			GO		jmp_bk,jmp_to			% Springe in die Unterroutine zum Einlesen
 											% der Funktionsparameter und sichern der
@@ -135,7 +136,7 @@ LdData		SETL	var_target,0			% Wir wollen ja die 0 erreichen
 			% Laden weiterer Werte (schon in Gleitkommadarstellung)
 			LDOU	var_x,data,24			% Da wir hier einen Float laden darf kein
 											% Vorzeichen berücksichtigt werden (daher
-											% das U für Vorzeichenlos) außerdem haben
+											% das U für Vorzeichenlos), außerdem haben
 											% Floats die Länge eines Oktas weshalb hier
 											% um 8 erhöht wurde
 			LDOU	var_dx,data,32
@@ -146,7 +147,7 @@ DoIter		CMPU	var_isnmax,var_n_max,var_n	% Prüft ob wir die maximale Zahl an
 												% Iterationen erreicht haben
 			BZ		var_isnmax,DoIterBack	% Für den Fall das wir die Maximale Zahl
 											% an Iteration ausgeführt haben springen
-											% wie weiter zum Label Back
+											% wir weiter zum Label Back
 			ADD		var_n,var_n,1			% Erhöhen des Iterationszählers um 1
 			GETA	jmp_to,CalcNextX		% Vorbereiten der Iteration
 			OR		jmp_bk1,jmp_bk,0		% Sichern der Rücksprungadresse
@@ -214,8 +215,8 @@ CalcF		SETL	var_f,0						% f_0 = 0
 			FADD	var_f,var_f,var_e			% f_4 = f_3 + e = a*x⁴ + b*x³ + c*x² + d*x + e
 			% Hinweis bei Rechnungen mit Gleitkommazahlen gibt es
 			% keine immediate Varianten (also nur solche mit $X,$Y,$Z
-			% und keine mit $X,$Y,Z
-			GO		jmp_bk,jmp_bk,0			% Rücksprung
+			% und keine mit $X,$Y,Z)
+			GO		jmp_bk,jmp_bk,0				% Rücksprung
 
 
 % Unterroutine zum Berechnen der Ableitung von f
@@ -227,16 +228,16 @@ CalcF		SETL	var_f,0						% f_0 = 0
 %             dx
 % beschreibt var_df, var_fx, var_f_s
 CalcDF		SETL	var_df,0				% f_0 = 0
-			OR		var_fx,var_x,0			% kopieren von x nach t1
+			OR		var_fx,var_x,0			% kopieren von x nach fx
 											% hier währe alternativ auch SET var_fx,var_x
 											% möglich der Assembler würde dies aber
 											% wieder zu einem OR übersetzen
 			GETA	jmp_to,CalcF			% Abrufen der Adresse des Unterprogramms
 			OR		jmp_bk3,jmp_bk,0		% Sichern der Rücksprungaddresse
-			GO		jmp_bk,jmp_to			% berechnet unsere var_f an der Stelle t1
+			GO		jmp_bk,jmp_to			% berechnet unsere var_f an der Stelle fx
 			OR		var_f_s,var_f,0			% sichern des Wertes in t3
 											% er ist an mehreren Stellen nützlich
-			FSUB	var_fx,var_x,var_dx		% t1 = x-dx
+			FSUB	var_fx,var_x,var_dx		% fx = x-dx
 			GO		jmp_bk,jmp_to			% Berechnen von f an einer weiteren Stelle
 			% Berechnen des Differentialquotienten
 			FSUB	var_fx,var_f_s,var_f		
