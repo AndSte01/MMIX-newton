@@ -7,6 +7,8 @@ This program was developed during the _Kleingruppen Übungen_ of the lecture _Gr
 
 The documentation is in german.
 
+![alt text](./graph.svg)
+
 ## Files
 `Newton Grafisch.ggb`: graphical drawing of the problem with the parameters used in the program. Open in [GeoGebra](https://geogebra.org/calculator)
 
