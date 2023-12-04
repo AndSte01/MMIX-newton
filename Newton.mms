@@ -62,7 +62,7 @@ jmp_bk3		IS $3	% dies eine unschöne Implementierung ist)
 jmp_to		IS $4	% Adresse zu der Gesprungen werden soll
 
 % Label für Register mit den Parametern unserer Kubischen Funktion. Die Funktion hat
-% das folgende Aussehen: y = a*x³ + b*x² + c*x + d
+% das folgende Aussehen: y = a*x⁴ + b*x³ + c*x² + d*x + e
 var_a		IS $5
 var_b		IS $6
 var_c		IS $7
